@@ -1279,6 +1279,17 @@
             else if (totalPossibleGain < neededPoints * 0.8) possibility = 'low';
             
             subjectStrategies.sort((a, b) => b.possibleGain - a.possibleGain);
+
+            // 상위 4과목만 선택
+            var top4Strategies = subjectStrategies.slice(0, 4);
+            
+            // 상위 4과목의 점수만 합산
+            var top4TotalGain = 0;
+            top4Strategies.forEach(function(strategy) {
+                top4TotalGain += strategy.possibleGain;
+            });
+            
+            console.log('상위 4과목 점수 확보 합계:', top4TotalGain);
             
             return {
                 recentTests: recentData,
@@ -1288,8 +1299,8 @@
                 targetScore: targetScore,
                 neededPoints: neededPoints,
                 possibility: possibility,
-                subjectStrategies: subjectStrategies.slice(0, 4),
-                totalPossibleGain: Math.round(totalPossibleGain * 10) / 10
+                subjectStrategies: top4Strategies,
+                totalPossibleGain: Math.round(top4TotalGain * 10) / 10
             };
         }
         
@@ -2542,12 +2553,15 @@
             
             // 선택과목 정보 추출
             var subjectTypes = [];
+            console.log('=== 선택과목 정보 추출 시작 ===');
             gradeKeys.forEach(function(testName) {
                 var gradeData = student.grades[testName];
+                console.log('시험:', testName, '선택과목:', gradeData.subjectType);
                 if (gradeData.subjectType && subjectTypes.indexOf(gradeData.subjectType) === -1) {
                     subjectTypes.push(gradeData.subjectType);
                 }
             });
+            console.log('최종 subjectTypes 배열:', subjectTypes);
             
             var subjectTypeDisplay = '';
             if (subjectTypes.length > 0) {
