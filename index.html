@@ -2086,11 +2086,14 @@
                 var source = row[1] ? row[1].toString().trim() : '';
                 var subjectType = row[2].toString().trim();
                 
-                console.log('등급컷 처리:', testName, '/', subjectType);
+                // 시험명 정규화 (공백 제거)
+                var normalizedTestName = testName.replace(/\s/g, '');
                 
-                if (!gradeCutData[testName]) {
-                    gradeCutData[testName] = {};
-                }
+                console.log('등급컷 처리:', normalizedTestName, '/', subjectType);
+                
+                if (!gradeCutData[normalizedTestName]) {
+                gradeCutData[normalizedTestName] = {};
+            }
                 
                 // D열부터 등급컷 정보 (D=1등급, E=2등급, F=3등급...)
                 var cuts = {};
@@ -2102,12 +2105,12 @@
                     }
                 }
                 
-                gradeCutData[testName][subjectType] = {
-                    source: source,
-                    cuts: cuts
-                };
-                
-                console.log('등급컷 저장 완료:', testName, subjectType, cuts);
+                gradeCutData[normalizedTestName][subjectType] = {
+                source: source,
+                cuts: cuts
+            };
+            
+            console.log('등급컷 저장 완료:', normalizedTestName, subjectType, cuts);
             }
             
             console.log('=== 최종 등급컷 데이터 ===');
@@ -2127,67 +2130,10 @@
             
             // 1. 등급컷 처리 (3번째 시트)
             processGradeCuts(workbook);
-            
-            // 2. 첫번째 시트에서 시험 출처 정보 추출
-            var firstSheetName = workbook.SheetNames[0];
-            if (workbook.Sheets[firstSheetName]) {
-                var firstSheet = workbook.Sheets[firstSheetName];
-                var firstSheetData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-                
-                console.log('첫번째 시트에서 출처 정보 추출:', firstSheetName);
-                
-                var sourceStartRow = -1;
-                var testNameColumn = -1;
-                var sourceColumn = 15;
-                
-                for (var i = 0; i < firstSheetData.length; i++) {
-                    var row = firstSheetData[i];
-                    if (row) {
-                        for (var j = 0; j < row.length; j++) {
-                            if (row[j] && row[j].toString().includes('시험출처')) {
-                                sourceStartRow = i + 1;
-                                console.log('시험출처 헤더 발견, 데이터 시작 행:', sourceStartRow + 1);
-                                break;
-                            }
-                        }
-                        if (sourceStartRow !== -1) break;
-                    }
-                }
-                
-                if (sourceStartRow === -1) {
-                    sourceStartRow = 6;
-                    console.log('시험출처 헤더를 찾지 못함. 7행부터 시작');
-                }
-                
-                for (var col = 0; col < 5; col++) {
-                    if (firstSheetData[sourceStartRow] && firstSheetData[sourceStartRow][col] && 
-                        firstSheetData[sourceStartRow][col].toString().includes('모클')) {
-                        testNameColumn = col;
-                        console.log('시험명 열 발견:', col + 1, '열');
-                        break;
-                    }
-                }
-                
-                if (testNameColumn === -1) {
-                    testNameColumn = 0;
-                }
-                
-                for (var i = sourceStartRow; i < firstSheetData.length; i++) {
-                    var row = firstSheetData[i];
-                    if (row && row[testNameColumn] && row[sourceColumn]) {
-                        var testName = row[testNameColumn].toString().trim();
-                        var source = row[sourceColumn].toString().trim();
-                        
-                        if (testName.includes('모클')) {
-                            testSources[testName] = source;
-                            console.log('출처 매핑:', testName, '->', source);
-                        }
-                    }
-                }
-                
-                console.log('수집된 시험 출처:', testSources);
-            }
-            
+
+            // 2. 등급컷 시트에서 시험 출처 정보 추출
+            extractTestSourcesFromGradeCuts(workbook);
+                      
             // 3. 출결번호-이름 매핑 처리
             var mappingSheetName = workbook.SheetNames[1];
             if (workbook.Sheets[mappingSheetName]) {
@@ -2277,7 +2223,16 @@
                     console.log('등급:', gradeFromSheet);
                     console.log('점수:', scoreFromSheet);
                     
-                    var source = testSources[sheetName] || '';
+                    var source = '';
+                    if (gradeCutData[sheetName]) {
+                        var subjectTypes = Object.keys(gradeCutData[sheetName]);
+                        if (subjectTypes.length > 0) {
+                            source = gradeCutData[sheetName][subjectTypes[0]].source || '';
+                        }
+                    }
+                    if (!source && window.testSources && window.testSources[sheetName]) {
+                        source = window.testSources[sheetName];
+                    }
                     
                     // 과목별 점수 수집 (F열부터)
                     var details = {};
@@ -2825,6 +2780,43 @@
             }
         });
 
+        // 등급컷 시트에서 출처 정보 추출하는 새 함수
+                function extractTestSourcesFromGradeCuts(workbook) {
+                    var testSources = {};
+                    
+                    // 3번째 시트에서 출처 정보 추출
+                    var gradeCutSheetName = workbook.SheetNames[2];
+                    if (!workbook.Sheets[gradeCutSheetName]) {
+                        console.log('등급컷 시트를 찾을 수 없습니다:', gradeCutSheetName);
+                        return testSources;
+                    }
+                    
+                    var gradeCutSheet = workbook.Sheets[gradeCutSheetName];
+                    var gradeCutSheetData = XLSX.utils.sheet_to_json(gradeCutSheet, {header: 1});
+                    
+                    console.log('등급컷 시트에서 출처 정보 추출:', gradeCutSheetName);
+                    
+                    for (var i = 1; i < gradeCutSheetData.length; i++) {
+                        var row = gradeCutSheetData[i];
+                        if (!row || !row[0] || !row[1]) continue;
+                        
+                        var testName = row[0].toString().trim();
+                        var source = row[1].toString().trim();
+                        
+                        var normalizedTestName = testName.replace(/\s/g, '');
+                        
+                        if (!testSources[normalizedTestName]) {
+                            testSources[normalizedTestName] = source;
+                            console.log('출처 매핑:', normalizedTestName, '->', source);
+                        }
+                    }
+                    
+                    window.testSources = testSources;
+                    console.log('최종 수집된 시험 출처:', testSources);
+                    
+                    return testSources;
+                }
+        
         // 페이지 로드 시 실행
         window.onload = function() {
             console.log('페이지 로드 시작');
