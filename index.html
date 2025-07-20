@@ -799,15 +799,15 @@
             margin-left: 8px;
         }
         
-        .subject-type.화법과작문 {
-            background: #10b981;
-            color: white;
-        }
-        
-        .subject-type.언어와매체 {
-            background: #3b82f6;
-            color: white;
-        }
+        .subject-type.화법과작문, .subject-type.화법과_작문 {
+                background: #10b981;
+                color: white;
+            }
+            
+            .subject-type.언어와매체, .subject-type.언어와_매체 {
+                background: #3b82f6;
+                color: white;
+            }
         
         @media (max-width: 768px) {
             .container {
@@ -1263,6 +1263,7 @@
                 }
                 
                 if (possibleGain > 0.5) {
+                    console.log('과목별 점수 확보:', subject, possibleGain + '점');
                     subjectStrategies.push({
                         subject: subject,
                         currentAvg: Math.round(recent4Avg),
@@ -1271,8 +1272,12 @@
                         possibleGain: Math.round(possibleGain * 10) / 10
                     });
                     totalPossibleGain += possibleGain;
+                    console.log('누적 총합:', totalPossibleGain);
                 }
             });
+            
+            console.log('최종 계산 결과:', totalPossibleGain);
+            console.log('표시될 값:', Math.round(totalPossibleGain * 10) / 10);
             
             // 가능성 재평가
             if (totalPossibleGain >= neededPoints * 1.2) possibility = 'high';
