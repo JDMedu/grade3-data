@@ -1696,8 +1696,8 @@
         
         // 기존 설정 로드
         function loadExistingConfig() {
-            var savedConfig = localStorage.getItem('githubConfig');
-            var savedDataUrl = localStorage.getItem('dataUrl');
+            var savedConfig = localStorage.getItem('grade3-githubConfig');
+            var savedDataUrl = localStorage.getItem('grade3-dataUrl');
             
             if (savedConfig && savedDataUrl) {
                 try {
@@ -1787,8 +1787,8 @@
             
             dataUrl = 'https://raw.githubusercontent.com/' + username + '/' + repo + '/main/grade3-data.json';
             
-            localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
-            localStorage.setItem('dataUrl', dataUrl);
+            localStorage.setItem('grade3-githubConfig', JSON.stringify(githubConfig));
+            localStorage.setItem('grade3-dataUrl', dataUrl);
             
             showStatus('GitHub 설정이 저장되었습니다!', 'success');
             
@@ -2858,8 +2858,8 @@
             }
             
             // 저장된 GitHub 설정 불러오기
-            var savedConfig = localStorage.getItem('githubConfig');
-            var savedDataUrl = localStorage.getItem('dataUrl');
+            var savedConfig = localStorage.getItem('grade3-githubConfig');
+            var savedDataUrl = localStorage.getItem('grade3-dataUrl');
             
             var finalConfig = null;
             var configSource = '';
@@ -2883,8 +2883,8 @@
                 dataUrl = 'https://raw.githubusercontent.com/' + finalConfig.username + '/' + finalConfig.repo + '/main/grade3-data.json';
                 
                 // localStorage에 저장 (다음에 더 빠르게 로드하기 위해)
-                localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
-                localStorage.setItem('dataUrl', dataUrl);
+                localStorage.setItem('grade3-githubConfig', JSON.stringify(githubConfig));
+                localStorage.setItem('grade3-dataUrl', dataUrl);
                 
                 console.log('데이터 로드 시작...');
                 // 약간의 지연 후 데이터 로드 시도
