@@ -2023,12 +2023,13 @@
                     updateProgress(70, 'GitHub에 업로드 중...');
                     
                     var uploadData = {
-                        students: studentByNumber,
-                        maxScores: maxScores,
-                        testSheets: window.discoveredTestSheets,
-                        attendanceMap: window.attendanceToNameMap,
-                        lastUpdated: new Date().toISOString()
-                    };
+                    students: studentByNumber,
+                    maxScores: maxScores,
+                    gradeCuts: gradeCutData,
+                    testSheets: window.discoveredTestSheets,
+                    attendanceMap: window.attendanceToNameMap,
+                    lastUpdated: new Date().toISOString()
+                };
                     
                     uploadToGitHub(uploadData)
                         .then(function(result) {
