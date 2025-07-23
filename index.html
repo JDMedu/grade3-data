@@ -2129,12 +2129,71 @@
             console.log('=== 고3 엑셀 데이터 파싱 시작 ===');
             console.log('시트 목록:', workbook.SheetNames);
             
-            // 1. 등급컷 처리 (3번째 시트)
+           // 1. 등급컷 처리 (3번째 시트)
             processGradeCuts(workbook);
+            
+            // 2. 첫번째 시트에서 시험 출처 정보 추출 (고2 방식)
+            extractTestSourcesFromFirstSheet(workbook);
 
-            // 2. 등급컷 시트에서 시험 출처 정보 추출
-            extractTestSourcesFromGradeCuts(workbook);
-                      
+            // 첫 번째 시트에서 출처 정보 추출하는 함수 (고2 방식)
+            function extractTestSourcesFromFirstSheet(workbook) {
+                var testSources = {};
+                
+                var firstSheetName = workbook.SheetNames[0];
+                if (!workbook.Sheets[firstSheetName]) {
+                    console.log('첫 번째 시트를 찾을 수 없습니다:', firstSheetName);
+                    return testSources;
+                }
+                
+                var firstSheet = workbook.Sheets[firstSheetName];
+                var firstSheetData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+                
+                console.log('첫 번째 시트에서 출처 정보 추출:', firstSheetName);
+                
+                var sourceStartRow = -1;
+                var testNameColumn = 0;  // A열
+                var sourceColumn = 12;   // M열 (인덱스 12)
+                
+                // "시험출처" 헤더가 있는 행 찾기
+                for (var i = 0; i < firstSheetData.length; i++) {
+                    var row = firstSheetData[i];
+                    if (row) {
+                        for (var j = 0; j < row.length; j++) {
+                            if (row[j] && row[j].toString().includes('시험출처')) {
+                                sourceStartRow = i + 1; // 데이터는 다음 행부터
+                                console.log('시험출처 헤더 발견, 데이터 시작 행:', sourceStartRow + 1);
+                                break;
+                            }
+                        }
+                        if (sourceStartRow !== -1) break;
+                    }
+                }
+                
+                if (sourceStartRow === -1) {
+                    console.log('시험출처 헤더를 찾지 못함');
+                    return testSources;
+                }
+                
+                // 시험 출처 데이터 추출
+                for (var i = sourceStartRow; i < firstSheetData.length; i++) {
+                    var row = firstSheetData[i];
+                    if (row && row[testNameColumn] && row[sourceColumn]) {
+                        var testName = row[testNameColumn].toString().trim();
+                        var source = row[sourceColumn].toString().trim();
+                        
+                        if (testName.includes('모클') || testName.includes('이감') || testName.includes('진단')) {
+                            testSources[testName] = source;
+                            console.log('출처 매핑:', testName, '->', source);
+                        }
+                    }
+                }
+                
+                window.testSources = testSources;
+                console.log('최종 수집된 시험 출처:', testSources);
+                
+                return testSources;
+            }
+            
             // 3. 출결번호-이름 매핑 처리
             var mappingSheetName = workbook.SheetNames[1];
             if (workbook.Sheets[mappingSheetName]) {
@@ -2224,16 +2283,12 @@
                     console.log('등급:', gradeFromSheet);
                     console.log('점수:', scoreFromSheet);
                     
+                    // 첫 번째 시트에서 추출한 출처 정보 사용
                     var source = '';
-                    if (gradeCutData[sheetName]) {
-                        var subjectTypes = Object.keys(gradeCutData[sheetName]);
-                        if (subjectTypes.length > 0) {
-                            source = gradeCutData[sheetName][subjectTypes[0]].source || '';
-                        }
-                    }
-                    if (!source && window.testSources && window.testSources[sheetName]) {
+                    if (window.testSources && window.testSources[sheetName]) {
                         source = window.testSources[sheetName];
                     }
+                    console.log('시험:', sheetName, '출처:', source);
                     
                     // 과목별 점수 수집 (F열부터)
                     var details = {};
