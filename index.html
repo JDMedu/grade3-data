@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모클 성적 조회 시스템 (AI 분석 포함) - 고3</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -838,6 +839,182 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        /* 추가 기능 스타일 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+        
+        .dashboard-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .stat-positive { color: #10b981; }
+        .stat-negative { color: #ef4444; }
+        .stat-neutral { color: #6b7280; }
+        
+        .dday-counter {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .dday-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .dday-text {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+        
+        /* 뱃지 컨테이너 */
+        .badge-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .achievement-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            min-height: 36px;
+            color: white;
+        }
+        
+        /* 뱃지 타입별 색상 */
+        .achievement-badge.grade { background: linear-gradient(45deg, #ffd700, #ff8c00); }
+        .achievement-badge.score { background: linear-gradient(45deg, #667eea, #764ba2); }
+        .achievement-badge.trend { background: linear-gradient(45deg, #ff6b6b, #feca57); }
+        .achievement-badge.improvement { background: linear-gradient(45deg, #10b981, #059669); }
+        .achievement-badge.attendance { background: linear-gradient(45deg, #8b5cf6, #7c3aed); }
+        .achievement-badge.special { background: linear-gradient(45deg, #f59e0b, #d97706); }
+        .achievement-badge.stability { background: linear-gradient(45deg, #06b6d4, #0891b2); }
+        .achievement-badge.rank { background: linear-gradient(45deg, #ef4444, #dc2626); }
+        .achievement-badge.recovery { background: linear-gradient(45deg, #84cc16, #65a30d); }
+        .achievement-badge.start { background: linear-gradient(45deg, #ec4899, #db2777); }
+        .achievement-badge.milestone { background: linear-gradient(45deg, #f97316, #ea580c); }
+        
+        .badge-new {
+            animation: pulse-badge 2s infinite;
+        }
+        
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .badge-summary {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        .progress-ring {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-text {
+            position: absolute;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* 그랜드 마스터 애니메이션 */
+        @keyframes grand-master-glow {
+            0% { 
+                box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 12px 35px rgba(255, 215, 0, 0.6);
+                transform: scale(1.02);
+            }
+        }
+        
+        /* 그랜드 마스터 전용 스타일 */
+        .grand-master-message {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+            animation: grand-master-glow 2s infinite alternate;
+        }
+        
     </style>
 </head>
 <body>
@@ -986,7 +1163,7 @@
 
     <script>
 
-        // 학업 운세 데이터 (행운의 과목 실제 고등학교 과목으로 교체)
+        // 학업 운세 데이터
         var fortuneData = {
             excellent: {
                 icon: "⭐",
@@ -1230,7 +1407,7 @@
             "모든 과목 복습", "모의고사", "영어단어", "암기과목"
         ];
         
-        // 학업 운세 계산 함수 (행운의 과목 2개, 행운의 번호 1개 랜덤 선택)
+        // 학업 운세 계산 함수
         function calculateStudyFortune(name) {
             if (!name) return null;
             
@@ -1265,7 +1442,7 @@
             };
         }
         
-        // 운세 표시 함수 (행운의 과목 2개 + 행운의 번호 추가)
+        // 운세 표시 함수
         function displayStudyFortune(name) {
             var fortune = calculateStudyFortune(name);
             if (!fortune) return '';
@@ -1331,7 +1508,7 @@
                         </div>
                         
                         <div style="font-size: 0.85em; color: #666; text-align: center; margin-top: 10px;">
-                            💡 운세는 재미로만 참고하세요. 진짜 중요한 건 꾸준한 노력입니다!
+                            💡 운세는 재미로만 참고하세요. 진짜 중요한 건 꾸준한 노력입니다! 질문, 상담은 언제나 교무실로. 
                             <br><br>
                             <a href="https://www.instagram.com/swwweet.daekun/" target="_blank" style="
                                 display: inline-flex; 
@@ -1347,11 +1524,453 @@
                                 transition: transform 0.2s;
                             " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                 📸 관리자 대건T Instagram
-                            </a>
+                                </a>
                         </div>
                     </div>
                 </div>
             `;
+        }
+        
+        // 📊 통계 계산 함수
+        function calculateStatistics(student) {
+            var grades = student.grades;
+            var gradeKeys = Object.keys(grades);
+            
+            if (gradeKeys.length === 0) return null;
+            
+            var scores = [];
+            var gradeValues = [];
+            var recentScores = [];
+            
+            gradeKeys.forEach(function(testName) {
+                var gradeData = grades[testName];
+                if (gradeData.score) scores.push(parseInt(gradeData.score));
+                if (gradeData.grade) gradeValues.push(parseInt(gradeData.grade));
+            });
+            
+            // 최근 3회 점수
+            recentScores = scores.slice(-3);
+            
+            var avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b) / scores.length) : 0;
+            var avgGrade = gradeValues.length > 0 ? Math.round(gradeValues.reduce((a, b) => a + b) / gradeValues.length * 10) / 10 : 0;
+            var bestScore = scores.length > 0 ? Math.max(...scores) : 0;
+            var bestGrade = gradeValues.length > 0 ? Math.min(...gradeValues) : 0;
+            var latestScore = scores.length > 0 ? scores[scores.length - 1] : 0;
+            
+            // 성적 변화 계산
+            var scoreChange = 0;
+            if (scores.length >= 2) {
+                var recent2 = scores.slice(-2);
+                scoreChange = recent2[1] - recent2[0];
+            }
+            
+            // 상위 퍼센트 계산 (임의 계산)
+            var percentile = Math.max(1, Math.min(99, Math.round((100 - avgGrade * 10) + Math.random() * 10)));
+            
+            return {
+                avgScore: avgScore,
+                avgGrade: avgGrade,
+                bestScore: bestScore,
+                bestGrade: bestGrade,
+                latestScore: latestScore,
+                scoreChange: scoreChange,
+                percentile: percentile,
+                testCount: gradeKeys.length,
+                totalTests: window.discoveredTestSheets ? window.discoveredTestSheets.length : 12
+            };
+        }
+        
+        // 분산 계산 헬퍼 함수
+        function calculateVariance(numbers) {
+            var mean = numbers.reduce((a, b) => a + b) / numbers.length;
+            var variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / numbers.length;
+            return variance;
+        }
+        
+        // 🏆 확장된 뱃지 시스템 (20개)
+        function generateAchievementBadges(student, stats) {
+            var badges = [];
+            var grades = student.grades;
+            var gradeKeys = Object.keys(grades);
+            
+            if (!stats) return badges;
+            
+            // 점수와 등급 데이터 준비
+            var scores = [];
+            var gradeValues = [];
+            var subjectScores = {};
+            
+            gradeKeys.forEach(function(testName) {
+                var gradeData = grades[testName];
+                if (gradeData.score) scores.push(parseInt(gradeData.score));
+                if (gradeData.grade) gradeValues.push(parseInt(gradeData.grade));
+                
+                // 과목별 점수 수집
+                if (gradeData.details) {
+                    Object.keys(gradeData.details).forEach(function(subject) {
+                        if (!subjectScores[subject]) subjectScores[subject] = [];
+                        subjectScores[subject].push(gradeData.details[subject]);
+                    });
+                }
+            });
+            
+            // 연속 상승/하락 체크
+            var consecutiveUp = 0;
+            var consecutiveDown = 0;
+            var maxConsecutiveUp = 0;
+            var maxConsecutiveDown = 0;
+            
+            for (var i = 1; i < scores.length; i++) {
+                if (scores[i] > scores[i-1]) {
+                    consecutiveUp++;
+                    consecutiveDown = 0;
+                    maxConsecutiveUp = Math.max(maxConsecutiveUp, consecutiveUp);
+                } else if (scores[i] < scores[i-1]) {
+                    consecutiveDown++;
+                    consecutiveUp = 0;
+                    maxConsecutiveDown = Math.max(maxConsecutiveDown, consecutiveDown);
+                } else {
+                    consecutiveUp = 0;
+                    consecutiveDown = 0;
+                }
+            }
+            
+            // 과목별 강점 체크
+            var strongSubjects = 0;
+            var excellentSubjects = 0;
+            Object.keys(subjectScores).forEach(function(subject) {
+                var avg = subjectScores[subject].reduce((a, b) => a + b) / subjectScores[subject].length;
+                if (avg >= 80) strongSubjects++;
+                if (avg >= 90) excellentSubjects++;
+            });
+            
+            // 🏆 뱃지 조건 체크 (20개 뱃지, 중복 가능)
+            
+            // 1. 등급 관련 뱃지 (5개)
+            if (stats.bestGrade === 1) {
+                badges.push({ icon: "👑", text: "1등급 달성", type: "grade", isNew: true });
+            }
+            if (stats.bestGrade <= 2) {
+                badges.push({ icon: "🏆", text: "상위등급 달성", type: "grade", isNew: false });
+            }
+            if (stats.bestGrade <= 3) {
+                badges.push({ icon: "🥉", text: "3등급 이내", type: "grade", isNew: false });
+            }
+            if (stats.avgGrade <= 2.5) {
+                badges.push({ icon: "🎪", text: "우수한 등급", type: "grade", isNew: false });
+            }
+            if (stats.avgGrade <= 1.5) {
+                badges.push({ icon: "🎖️", text: "최상위 등급", type: "grade", isNew: true });
+            }
+            
+            // 2. 점수 관련 뱃지 (4개)
+            if (stats.bestScore >= 95) {
+                badges.push({ icon: "💎", text: "95점 이상", type: "score", isNew: true });
+            }
+            if (stats.avgScore >= 85) {
+                badges.push({ icon: "🌟", text: "고득점자", type: "score", isNew: false });
+            }
+            if (stats.bestScore >= 100) {
+                badges.push({ icon: "🎯", text: "만점 달성", type: "score", isNew: true });
+            }
+            if (stats.avgScore >= 90) {
+                badges.push({ icon: "✨", text: "우수한 평균", type: "score", isNew: false });
+            }
+            
+            // 3. 성적 변화 뱃지 (3개)
+            if (maxConsecutiveUp >= 2) {
+                badges.push({ icon: "🔥", text: "연속 상승", type: "trend", isNew: true });
+            }
+            if (maxConsecutiveUp >= 3) {
+                badges.push({ icon: "🚀", text: "3연속 상승", type: "trend", isNew: true });
+            }
+            if (maxConsecutiveUp >= 4) {
+                badges.push({ icon: "🌪️", text: "폭풍 상승", type: "trend", isNew: true });
+            }
+            
+            // 4. 점수 개선 뱃지 (3개)
+            if (stats.scoreChange >= 15) {
+                badges.push({ icon: "📈", text: "대폭 상승", type: "improvement", isNew: true });
+            }
+            if (stats.scoreChange >= 25) {
+                badges.push({ icon: "⚡", text: "폭발적 상승", type: "improvement", isNew: true });
+            }
+            if (stats.scoreChange >= 35) {
+                badges.push({ icon: "🎆", text: "기적의 상승", type: "improvement", isNew: true });
+            }
+            
+            // 5. 출석 및 성실성 뱃지 (3개)
+            if (stats.testCount >= 5) {
+                badges.push({ icon: "⭐", text: "성실한 응시", type: "attendance", isNew: false });
+            }
+            if (stats.testCount >= 8) {
+                badges.push({ icon: "💪", text: "꾸준한 도전", type: "attendance", isNew: false });
+            }
+            if (stats.testCount === stats.totalTests) {
+                badges.push({ icon: "🏅", text: "완벽한 출석", type: "attendance", isNew: true });
+            }
+            
+            // 6. 특별 성취 뱃지 (2개)
+            if (strongSubjects >= 3) {
+                badges.push({ icon: "🧠", text: "다재다능", type: "special", isNew: false });
+            }
+            if (excellentSubjects >= 2) {
+                badges.push({ icon: "🎨", text: "과목 마스터", type: "special", isNew: false });
+            }
+            
+            // 새로 추가된 뱃지들 (6개)
+            
+            // 7. 안정성 뱃지 (2개)
+            if (scores.length >= 3) {
+                var scoreVariance = calculateVariance(scores);
+                if (scoreVariance < 50) {
+                    badges.push({ icon: "🛡️", text: "안정적 성취", type: "stability", isNew: false });
+                }
+                if (scoreVariance < 25) {
+                    badges.push({ icon: "🏰", text: "완벽한 안정", type: "stability", isNew: true });
+                }
+            }
+            
+            // 8. 순위 관련 뱃지 (2개)
+            if (stats.percentile <= 5) {
+                badges.push({ icon: "🥇", text: "상위 5%", type: "rank", isNew: true });
+            }
+            if (stats.percentile <= 20) {
+                badges.push({ icon: "🎖️", text: "상위 20%", type: "rank", isNew: false });
+            }
+            
+            // 9. 특수 상황 뱃지 (2개)
+            if (maxConsecutiveDown >= 2 && consecutiveUp >= 2) {
+                badges.push({ icon: "🔄", text: "극적 회복", type: "recovery", isNew: true });
+            }
+            if (scores.length >= 5 && scores[scores.length-1] > scores[0] + 20) {
+                badges.push({ icon: "📊", text: "장기 성장", type: "recovery", isNew: false });
+            }
+            
+            return badges;
+        }
+        
+        // 📅 D-day 계산
+        function calculateDday() {
+            var today = new Date();
+            
+            // 고2/고3 구분 (페이지 제목으로 판단)
+            var isGrade3 = document.title.includes('고3');
+            
+            var examDate;
+            if (isGrade3) {
+                examDate = new Date('2025-11-13'); // 고3: 25년 11.13.(목)
+            } else {
+                examDate = new Date('2026-11-19'); // 고2: 26년 11.19.(목)
+            }
+            
+            var diffTime = examDate - today;
+            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return {
+                days: diffDays,
+                examDate: examDate,
+                isGrade3: isGrade3
+            };
+        }
+        
+        // 📈 성적 그래프 생성
+        function createGradeChart(student) {
+            var grades = student.grades;
+            var gradeKeys = Object.keys(grades);
+            
+            if (gradeKeys.length < 2) return null;
+            
+            var labels = [];
+            var scoreData = [];
+            var gradeData = [];
+            
+            gradeKeys.forEach(function(testName) {
+                var gradeInfo = grades[testName];
+                labels.push(testName);
+                scoreData.push(gradeInfo.score || 0);
+                gradeData.push(gradeInfo.grade || 9);
+            });
+            
+            return {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '점수',
+                        data: scoreData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '등급',
+                        data: gradeData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }
+                ]
+            };
+        }
+        
+        // 통합 대시보드 표시 함수
+        function displayDashboard(student) {
+            var stats = calculateStatistics(student);
+            var badges = generateAchievementBadges(student, stats);
+            var dday = calculateDday();
+            
+            if (!stats) return '';
+            
+            var changeIcon = stats.scoreChange > 0 ? '📈' : stats.scoreChange < 0 ? '📉' : '➡️';
+            var changeClass = stats.scoreChange > 0 ? 'stat-positive' : stats.scoreChange < 0 ? 'stat-negative' : 'stat-neutral';
+            var changeText = stats.scoreChange > 0 ? '+' + stats.scoreChange : stats.scoreChange;
+            
+            return `
+                <!-- D-day 카운터 -->
+                <div class="dday-counter">
+                    <div class="dday-text">${dday.isGrade3 ? '🎯 수능' : '📚 수능'}까지</div>
+                    <div class="dday-number">D-${dday.days}</div>
+                    <div style="font-size: 1em; opacity: 0.9;">
+                        ${dday.examDate.toLocaleDateString('ko-KR', {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'})}
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <!-- 📊 통계 대시보드 -->
+                    <div class="dashboard-card">
+                        <h3>📊 성적 통계</h3>
+                        <div class="stat-item">
+                            <span class="stat-label">평균 점수</span>
+                            <span class="stat-value">${stats.avgScore}점</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">평균 등급</span>
+                            <span class="stat-value">${stats.avgGrade}등급</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">최고 성적</span>
+                            <span class="stat-value">${stats.bestGrade}등급 ${stats.bestScore}점</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">최근 변화</span>
+                            <span class="stat-value ${changeClass}">${changeIcon} ${changeText}점</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">예상 순위</span>
+                            <span class="stat-value">상위 ${stats.percentile}%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">응시율</span>
+                            <span class="stat-value">${Math.round(stats.testCount/stats.totalTests*100)}% (${stats.testCount}/${stats.totalTests}회)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 🏆 성취 뱃지 -->
+                    <div class="dashboard-card">
+                        <h3>🏆 성취 뱃지 <span style="font-size: 0.8em; color: #667eea;">(${badges.length}/20개 획득)</span></h3>
+                        
+                        ${badges.length >= 20 ? 
+                            `<div style="
+                                background: linear-gradient(135deg, #ffd700, #ff8c00); 
+                                color: white; 
+                                border-radius: 15px; 
+                                padding: 20px; 
+                                margin: 15px 0; 
+                                text-align: center; 
+                                box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+                                animation: grand-master-glow 2s infinite alternate;
+                            ">
+                                <div style="font-size: 2em; margin-bottom: 10px;">🎊👑🎊</div>
+                                <div style="font-size: 1.3em; font-weight: bold; margin-bottom: 10px;">
+                                    축하합니다! 모든 뱃지를 모아<br>
+                                    국어 그랜드 마스터가 되었습니다! 🏆
+                                </div>
+                                <div style="font-size: 1.1em; opacity: 0.95;">
+                                    이대건T에게 가서 선물을 수령하세요! 🎁
+                                </div>
+                            </div>` : 
+                            ''
+                        }
+                        
+                        ${badges.length > 0 ? 
+                            '<div class="badge-summary">총 ' + badges.length + '/20개의 뱃지를 획득했습니다!' + 
+                            (badges.length >= 20 ? ' 🎉 그랜드 마스터 달성!' : badges.length >= 15 ? ' 거의 다 모았어요!' : '') + '</div>' +
+                            '<div class="badge-container">' +
+                            badges.map(badge => 
+                                `<div class="achievement-badge ${badge.type} ${badge.isNew ? 'badge-new' : ''}">
+                                    <span>${badge.icon}</span>
+                                    <span>${badge.text}</span>
+                                    ${badge.isNew ? '<span style="font-size: 0.7em;">NEW!</span>' : ''}
+                                </div>`
+                            ).join('') +
+                            '</div>' :
+                            '<p style="color: #666; text-align: center; padding: 20px;">더 많은 시험을 치르면 뱃지를 획득할 수 있어요!</p>'
+                        }
+                    </div>
+                </div>
+                
+                <!-- 📈 성적 변화 그래프 -->
+                <div class="dashboard-card" style="margin: 25px 0;">
+                    <h3>📈 성적 변화 추이</h3>
+                    <div class="chart-container">
+                        <canvas id="gradeChart_${student.attendanceNumber}"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Chart.js 그래프 생성
+        function createChart(student) {
+            var chartData = createGradeChart(student);
+            if (!chartData) return;
+            
+            var ctx = document.getElementById('gradeChart_' + student.attendanceNumber);
+            if (!ctx) return;
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '점수'
+                            },
+                            min: 0,
+                            max: 100
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '등급'
+                            },
+                            min: 1,
+                            max: 9,
+                            reverse: true,
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
         }
         
         var studentByNumber = {};
@@ -2928,6 +3547,12 @@
             displaySummaryTable(student);
             displayGrades(student.grades);
             resultsDiv.style.display = 'block';
+
+            // 그래프 생성 (약간의 지연 후)
+            setTimeout(function() {
+                createChart(student);
+            }, 100);
+            
         }
 
         function displayStudentInfo(student) {
@@ -2961,7 +3586,8 @@
                 '<div style="display: flex; justify-content: space-between;"><span style="font-weight: 600; color: #555;">응시 현황:</span><span style="color: #333; font-weight: bold;">' + attendedTests + '/' + totalTests + '회</span></div>' +
                 subjectTypeDisplay +
                 '</div></div>' +
-                displayStudyFortune(student.name);
+                displayStudyFortune(student.name) +
+                displayDashboard(student);
         }
 
         function displaySummaryTable(student) {
@@ -3149,11 +3775,11 @@
                         var ratioColor = ratio >= 80 ? '#e74c3c' : ratio >= 60 ? '#f39c12' : ratio >= 40 ? '#f1c40f' : '#95a5a6';
                         
                         detailsHtml += 
-                            '<div class="grade-item">' +
-                            '<span class="grade-label">' + subject + '</span>' +
-                            '<span class="grade-value">' + score + '점 ' +
-                            '<span style="color: ' + ratioColor + '; font-size: 0.85em;">(' + ratio + '%)</span>' +
-                            '</span></div>';
+                        '<div class="grade-item" style="padding: 4px 8px; font-size: 0.8em;">' +
+                        '<span class="grade-label" style="font-size: 0.75em;">' + subject + '</span>' +
+                        '<span class="grade-value" style="font-size: 0.8em;">' + score + '점 ' +
+                        '<span style="color: ' + ratioColor + '; font-size: 0.7em;">(' + ratio + '%)</span>' +
+                        '</span></div>';
                     }
                 }
 
@@ -3165,29 +3791,29 @@
                     cutInfo += '<div class="grade-summary-item"><div class="grade-summary-value" style="font-size: 0.9em; color: #667eea;">' + gradeData.subjectType + '</div><div class="grade-summary-label">선택과목</div></div>';
                 }
                 
-                if (gradeData.gradeCut) {
-                    cutInfo += '<div class="grade-summary-item"><div class="grade-summary-value">' + gradeData.gradeCut + '점</div><div class="grade-summary-label">내 등급컷</div></div>';
-                }
-                
-                if (gradeData.needScore !== null && gradeData.needScore !== undefined) {
-                    var needScoreDisplay = gradeData.needScore > 0 ? '+' + gradeData.needScore : gradeData.needScore;
-                    var needScoreColor = gradeData.needScore <= 0 ? '#2ecc71' : '#e74c3c';
-                    cutInfo += '<div class="grade-summary-item"><div class="grade-summary-value" style="color: ' + needScoreColor + '">' + needScoreDisplay + '점</div><div class="grade-summary-label">한등급↑ 필요점수</div></div>';
-                }
-                
-                var sourceInfo = '';
-                if (gradeData.source && gradeData.source.trim() !== '') {
-                    sourceInfo = '<div class="grade-summary-item"><div class="grade-summary-value" style="font-size: 0.9em; color: #666;">' + gradeData.source + '</div><div class="grade-summary-label">출처</div></div>';
-                }
+              if (gradeData.gradeCut) {
+                cutInfo += '<div class="grade-summary-item"><div class="grade-summary-value" style="font-size: 1.1em;">' + gradeData.gradeCut + '점</div><div class="grade-summary-label" style="font-size: 0.75em;">내 등급컷</div></div>';
+            }
+            
+            if (gradeData.needScore !== null && gradeData.needScore !== undefined) {
+                var needScoreDisplay = gradeData.needScore > 0 ? '+' + gradeData.needScore : gradeData.needScore;
+                var needScoreColor = gradeData.needScore <= 0 ? '#2ecc71' : '#e74c3c';
+                cutInfo += '<div class="grade-summary-item"><div class="grade-summary-value" style="color: ' + needScoreColor + '; font-size: 1.1em;">' + needScoreDisplay + '점</div><div class="grade-summary-label" style="font-size: 0.75em;">한등급↑ 필요점수</div></div>';
+            }
+            
+            var sourceInfo = '';
+            if (gradeData.source && gradeData.source.trim() !== '') {
+                sourceInfo = '<div class="grade-summary-item"><div class="grade-summary-value" style="font-size: 0.8em; color: #666;">' + gradeData.source + '</div><div class="grade-summary-label" style="font-size: 0.75em;">출처</div></div>';
+            }
                 
                 gradeCard.innerHTML = 
-                    '<h3>📝 ' + testName + '</h3>' +
-                    '<div class="grade-summary">' +
-                    '<div class="grade-summary-item"><div class="grade-summary-value grade-' + gradeData.grade + '">' + gradeData.grade + '등급</div><div class="grade-summary-label">내 등급</div></div>' +
-                    '<div class="grade-summary-item"><div class="grade-summary-value">' + gradeData.score + '점</div><div class="grade-summary-label">내 점수</div></div>' +
-                    cutInfo + sourceInfo + '</div>' +
-                    (detailsHtml ? '<div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;"><h4 style="margin-bottom: 10px; color: #333; font-size: 1em;">📊 과목별 성취도 (점수 및 비율)</h4><div class="grade-details">' + detailsHtml + '</div></div>' : '');
-                
+                '<h3 style="font-size: 1.1em; margin-bottom: 12px;">📝 ' + testName + '</h3>' +
+                '<div class="grade-summary" style="grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 12px; padding: 10px;">' +
+                '<div class="grade-summary-item"><div class="grade-summary-value grade-' + gradeData.grade + '" style="font-size: 1.1em;">' + gradeData.grade + '등급</div><div class="grade-summary-label" style="font-size: 0.75em;">내 등급</div></div>' +
+                '<div class="grade-summary-item"><div class="grade-summary-value" style="font-size: 1.1em;">' + gradeData.score + '점</div><div class="grade-summary-label" style="font-size: 0.75em;">내 점수</div></div>' +
+                cutInfo + sourceInfo + '</div>' +
+                (detailsHtml ? '<div style="margin: 10px 0; padding: 8px; background: #f8f9fa; border-radius: 6px;"><h4 style="margin-bottom: 8px; color: #333; font-size: 0.85em;">📊 과목별 성취도 (점수 및 비율)</h4><div class="grade-details" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px;">' + detailsHtml + '</div></div>' : '');
+              
                 gradeCardsDiv.appendChild(gradeCard);
             }
         }
@@ -3324,6 +3950,9 @@
             
             updateStudentTab();
         };
+
+
+        
     </script>
 </body>
 </html>
