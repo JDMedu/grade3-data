@@ -986,7 +986,7 @@
 
     <script>
 
-        // 학업 운세 데이터 (행운의 과목 추가)
+        // 학업 운세 데이터 (행운의 과목 실제 고등학교 과목으로 교체)
         var fortuneData = {
             excellent: {
                 icon: "⭐",
@@ -1004,7 +1004,6 @@
                     "선생님께 어려운 질문을 던져보세요",
                     "새로운 학습 앱이나 도구를 활용해보세요"
                 ],
-                luckySubjects: ["수학", "과학", "철학", "논리"],
                 studyTips: [
                     "오늘은 평소보다 30% 더 집중할 수 있는 날입니다!",
                     "가장 어려운 과목부터 시작해보세요!",
@@ -1028,7 +1027,6 @@
                     "예습보다는 심화 학습에 시간을 투자하세요",
                     "오늘 정리한 내용은 시험에 나올 확률이 높아요"
                 ],
-                luckySubjects: ["물리", "화학", "수학", "영어"],
                 studyTips: [
                     "깊이 있는 학습에 집중해보세요!",
                     "어려운 문제집을 도전해보는 날이에요!",
@@ -1052,7 +1050,6 @@
                     "오답노트 정리하기에 최적의 날입니다",
                     "여러 과목을 골고루 공부하세요"
                 ],
-                luckySubjects: ["국어", "사회", "역사", "지리"],
                 studyTips: [
                     "포모도로 기법(25분 집중 + 5분 휴식)을 활용해보세요!",
                     "컬러펜으로 중요한 부분을 표시해보세요!",
@@ -1076,7 +1073,6 @@
                     "평소 좋아하는 과목부터 시작하세요",
                     "충분한 수면과 휴식을 취하며 공부하세요"
                 ],
-                luckySubjects: ["국어", "영어", "도덕", "예술"],
                 studyTips: [
                     "오늘은 가벼운 독서나 요약 정리가 좋겠어요!",
                     "기본 개념 위주로 천천히 공부해보세요!",
@@ -1100,7 +1096,6 @@
                     "복잡한 내용보다 간단한 것부터 시작하세요",
                     "친구들과의 잡담은 잠시 미뤄두세요"
                 ],
-                luckySubjects: ["체육", "음악", "미술", "기술"],
                 studyTips: [
                     "오늘은 한 과목에만 집중해보세요!",
                     "타이머를 설정해서 짧게 짧게 공부해보세요!",
@@ -1124,7 +1119,6 @@
                     "스트레스를 받지 말고 여유롭게 접근하세요",
                     "평소보다 휴식 시간을 늘려가며 공부하세요"
                 ],
-                luckySubjects: ["체육", "음악", "미술", "생활"],
                 studyTips: [
                     "오늘은 복습 위주로 가볍게 공부하세요!",
                     "친구와 함께 공부하면 더 좋을 거예요!",
@@ -1148,7 +1142,6 @@
                     "개념 간의 연결고리를 찾아보세요",
                     "시험 범위를 전체적으로 정리해보세요"
                 ],
-                luckySubjects: ["모든 과목", "복습", "정리", "암기"],
                 studyTips: [
                     "지난주 배운 내용을 훑어보는 시간을 가져보세요!",
                     "오답노트를 꺼내서 다시 풀어보세요!",
@@ -1172,7 +1165,6 @@
                     "암기보다는 이미지로 연상해서 기억하세요",
                     "새로운 학습 도구나 앱을 활용해보세요"
                 ],
-                luckySubjects: ["미술", "음악", "국어", "창작"],
                 studyTips: [
                     "오늘은 색깔 펜으로 예쁘게 노트 정리를 해보세요!",
                     "마인드맵을 그려가며 공부해보세요!",
@@ -1196,7 +1188,6 @@
                     "경쟁 의식을 활용해서 공부해보세요",
                     "성취감을 느낄 수 있는 작은 목표들을 만들어보세요"
                 ],
-                luckySubjects: ["수학", "과학", "영어", "논술"],
                 studyTips: [
                     "오늘은 꿈과 목표를 다시 한번 되새겨보세요!",
                     "가장 어려운 문제집을 도전해보세요!",
@@ -1220,7 +1211,6 @@
                     "급하게 서두르지 말고 차근차근 진행하세요",
                     "내면의 집중력을 끌어올려보세요"
                 ],
-                luckySubjects: ["국어", "철학", "명상", "독서"],
                 studyTips: [
                     "조용한 음악을 들으며 공부해보세요!",
                     "깊은 호흡을 하며 마음을 차분히 하세요!",
@@ -1230,7 +1220,17 @@
             }
         };
         
-        // 학업 운세 계산 함수 (3개 조언만 선택)
+        // 전체 행운의 과목 목록
+        var allLuckySubjects = [
+            "국어", "독서(비문학)", "문학", "화법과 작문", "언어와 매체", 
+            "수학1", "수학2", "미적분", "확률과 통계", "기하", 
+            "영어", "영어듣기", "한국사", "과탐", "사탐", 
+            "독서(인문)", "독서(과학)", "독서(사회)", 
+            "현대시", "현대소설", "고전시", "고전소설",
+            "모든 과목 복습", "모의고사", "영어단어", "암기과목"
+        ];
+        
+        // 학업 운세 계산 함수 (행운의 과목 2개, 행운의 번호 1개 랜덤 선택)
         function calculateStudyFortune(name) {
             if (!name) return null;
             
@@ -1247,21 +1247,25 @@
             var index = sum % fortuneTypes.length;
             var type = fortuneTypes[index];
             
-            // 랜덤하게 조언 3개와 팁 1개 선택
+            // 랜덤하게 조언 3개, 팁 1개, 행운의 과목 2개, 행운의 번호 1개 선택
             var selectedAdvice = fortuneData[type].advice.slice().sort(() => 0.5 - Math.random()).slice(0, 3);
             var selectedTip = fortuneData[type].studyTips[Math.floor(Math.random() * fortuneData[type].studyTips.length)];
+            var selectedSubjects = allLuckySubjects.slice().sort(() => 0.5 - Math.random()).slice(0, 2);
+            var luckyNumber = Math.floor(Math.random() * 5) + 1; // 1~5 중 랜덤
             
             return {
                 type: type,
                 data: {
                     ...fortuneData[type],
                     selectedAdvice: selectedAdvice,
-                    selectedTip: selectedTip
+                    selectedTip: selectedTip,
+                    selectedSubjects: selectedSubjects,
+                    luckyNumber: luckyNumber
                 }
             };
         }
         
-        // 운세 표시 함수 (기존 채팅 스타일 적용)
+        // 운세 표시 함수 (행운의 과목 2개 + 행운의 번호 추가)
         function displayStudyFortune(name) {
             var fortune = calculateStudyFortune(name);
             if (!fortune) return '';
@@ -1289,12 +1293,33 @@
                             </ul>
                         </div>
                         
-                        <div style="background: rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 15px; margin: 15px 0;">
-                            <h4 style="color: #444; margin-bottom: 10px;">📚 행운의 과목</h4>
-                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                ${fortune.data.luckySubjects.map(subject => 
-                                    `<span style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 4px 12px; border-radius: 15px; font-size: 0.9em; font-weight: bold;">${subject}</span>`
-                                ).join('')}
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                            <div style="background: rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 15px;">
+                                <h4 style="color: #444; margin-bottom: 10px;">📚 행운의 과목</h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    ${fortune.data.selectedSubjects.map(subject => 
+                                        `<span style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.9em; font-weight: bold; text-align: center;">${subject}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            
+                            <div style="background: rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 15px;">
+                                <h4 style="color: #444; margin-bottom: 10px;">🍀 행운의 번호</h4>
+                                <div style="display: flex; justify-content: center; align-items: center; height: 60px;">
+                                    <span style="
+                                        background: linear-gradient(45deg, #ff6b6b, #feca57); 
+                                        color: white; 
+                                        font-size: 2em; 
+                                        font-weight: bold; 
+                                        width: 50px; 
+                                        height: 50px; 
+                                        border-radius: 50%; 
+                                        display: flex; 
+                                        align-items: center; 
+                                        justify-content: center;
+                                        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                                    ">${fortune.data.luckyNumber}</span>
+                                </div>
                             </div>
                         </div>
                         
@@ -1321,7 +1346,7 @@
                                 font-size: 0.9em;
                                 transition: transform 0.2s;
                             " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                📸 관리자 대건T Instagram 
+                                📸 Instagram 팔로우하기
                             </a>
                         </div>
                     </div>
