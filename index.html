@@ -81,8 +81,8 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 15px;
-            padding: 25px;
-            margin: 25px 0;
+            padding: 15px;
+            margin: 15px 0;
             position: relative;
             overflow: hidden;
         }
@@ -108,14 +108,14 @@
         }
         
         .ai-icon {
-            width: 50px;
-            height: 50px;
+            width: 35px;
+            height: 35px;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 18px;
             backdrop-filter: blur(10px);
         }
         
@@ -811,10 +811,75 @@
             }
         
         @media (max-width: 768px) {
+            /* 뷰포트 단위로 전체 크기 자동 조정 */
             .container {
-                padding: 20px;
+                padding: 4vw; /* 화면 너비의 4% */
+                font-size: 3.5vw; /* 기본 폰트를 화면 너비의 3.5%로 */
             }
             
+            /* 제목들 뷰포트 단위 적용 */
+            .header h1 {
+                font-size: 7vw; /* 화면 너비의 7% */
+            }
+            
+            .header p {
+                font-size: 4vw; /* 화면 너비의 4% */
+            }
+            
+            /* 탭 버튼 크기 조정 */
+            .tab {
+                font-size: 3.5vw;
+                padding: 3vw 5vw;
+            }
+            
+            /* 검색 입력창과 버튼 */
+            .search-input {
+                font-size: 4vw;
+                padding: 3vw;
+            }
+            
+            .search-btn {
+                font-size: 3.5vw;
+                padding: 3vw 5vw;
+            }
+            
+            /* AI 분석 섹션 */
+            .ai-analysis h3 {
+                font-size: 4.5vw;
+            }
+            
+            .ai-analysis h4 {
+                font-size: 3.5vw;
+            }
+            
+            /* 테이블 */
+            .grade-table {
+                font-size: 2.8vw;
+            }
+            
+            /* 테이블 컨테이너 오버플로우 해결 */
+            .summary-table {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+            }
+            
+            .grade-table {
+                min-width: 100%;
+                white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+            }
+            
+            .grade-table th,
+            .grade-table td {
+                min-width: 60px; /* 최소 너비 설정 */
+                padding: 2vw 1vw; /* 패딩을 뷰포트 단위로 */
+                font-size: 2.5vw; /* 조금 더 작게 */
+            }
+            
+            .test-name {
+                min-width: 80px !important; /* 시험명 칸은 조금 더 넓게 */
+            }
+            
+            /* 기존 레이아웃 조정들 */
             .search-box {
                 flex-direction: column;
             }
@@ -827,16 +892,88 @@
                 flex-direction: column;
             }
             
-            .grade-table {
-                font-size: 0.8em;
-            }
-            
             .analysis-grid {
                 grid-template-columns: 1fr;
             }
             
             .recent-tests-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            /* 과목별 성취도 테이블 개선 */
+            .summary-table div[style*="overflow-x: auto"] {
+                padding-bottom: 10px; /* 스크롤바 여백 */
+            }
+            
+            .summary-table table[style*="min-width: 1200px"] {
+                min-width: 800px !important; /* 모바일에서는 800px로 축소 */
+            }
+            
+            /* 대시보드 모바일 최적화 */
+            .dashboard-grid {
+                grid-template-columns: 1fr !important; /* 한 열로 변경 */
+                gap: 15px;
+            }
+            
+            .dashboard-card {
+                padding: 15px; /* 패딩 축소 */
+                font-size: 3.2vw; /* 뷰포트 단위 적용 */
+            }
+            
+            .dashboard-card h3 {
+                font-size: 4vw;
+                margin-bottom: 12px;
+            }
+            
+            .stat-item {
+                padding: 2vw 0;
+                font-size: 3vw;
+            }
+            
+            .stat-label {
+                font-size: 3vw;
+            }
+            
+            .stat-value {
+                font-size: 3.2vw;
+            }
+            
+            /* D-day 카운터 모바일 최적화 */
+            .dday-counter {
+                padding: 15px;
+                margin: 15px 0;
+            }
+            
+            .dday-number {
+                font-size: 2.5em; /* 3em에서 축소 */
+            }
+            
+            .dday-text {
+                font-size: 4vw;
+            }
+            
+            /* 뱃지 컨테이너 모바일 최적화 */
+            .badge-container {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* 140px에서 120px로 축소 */
+                gap: 6px;
+            }
+            
+            .achievement-badge {
+                padding: 6px 8px; /* 8px 10px에서 축소 */
+                font-size: 2.8vw; /* 0.85em에서 뷰포트 단위로 */
+                min-height: 32px; /* 36px에서 축소 */
+            }
+            
+            .badge-summary {
+                font-size: 3vw;
+                padding: 8px;
+                margin: 12px 0;
+            }
+            
+            /* 차트 컨테이너 모바일 최적화 */
+            .chart-container {
+                height: 250px; /* 300px에서 축소 */
+                margin: 15px 0;
             }
         }
 
@@ -1102,9 +1239,7 @@
                 <button onclick="checkAdminPassword()" class="admin-btn">🔑 인증</button>
                 <button onclick="resetAdminAccess()" class="admin-btn" style="background: #dc3545; color: white;">🔄 초기화</button>
                 
-                <p style="margin-top: 15px; font-size: 0.9em;">
-                    <strong>📌 관리자 비밀번호:</strong> teacher123
-                </p>
+                
             </div>
             
             <!-- GitHub 저장소 설정 섹션 -->
@@ -1454,8 +1589,8 @@
                             ${fortune.data.icon}
                         </div>
                         <div>
-                            <h3 style="color: #333; font-size: 1.5em;">${name}님의 학업 운세</h3>
-                            <div style="font-size: 1.8em; font-weight: bold; margin-top: 8px;">
+                            <h3 style="color: #333; font-size: 1.2em;">${name}님의 학업 운세</h3>
+                            <div style="font-size: 1.4em; font-weight: bold; margin-top: 6px;">
                                 <span style="color: #333;">${fortune.data.title}</span>
                                 <span style="color: #FFD700; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); margin-left: 8px;">${fortune.data.stars}</span>
                             </div>
@@ -1463,7 +1598,7 @@
                     </div>
                     
                     <div class="ai-content">
-                        <div style="background: rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 15px; margin: 15px 0;">
+                        <div style="background: rgba(255, 255, 255, 0.3); border-radius: 10px; padding: 12px; margin: 10px 0;">
                             <h4 style="color: #444; margin-bottom: 10px;">💡 오늘의 학습 조언</h4>
                             <ul style="margin: 0; padding-left: 20px; color: #555;">
                                 ${fortune.data.selectedAdvice.map(advice => `<li style="margin-bottom: 5px;">${advice}</li>`).join('')}
@@ -1508,23 +1643,40 @@
                         </div>
                         
                         <div style="font-size: 0.85em; color: #666; text-align: center; margin-top: 10px;">
-                            💡 운세는 재미로만 참고하세요. 진짜 중요한 건 꾸준한 노력입니다! 질문, 상담은 언제나 교무실로. 
+                            💡 운세는 재미로만 참고하세요. 진짜 중요한 건 꾸준한 노력입니다!
                             <br><br>
-                            <a href="https://www.instagram.com/swwweet.daekun/" target="_blank" style="
-                                display: inline-flex; 
-                                align-items: center; 
-                                gap: 8px; 
-                                background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737, #FCAF45, #FFDC80);
-                                color: white; 
-                                text-decoration: none; 
-                                padding: 8px 16px; 
-                                border-radius: 20px; 
-                                font-weight: bold; 
-                                font-size: 0.9em;
-                                transition: transform 0.2s;
-                            " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                📸 관리자 대건T Instagram
+                            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                                <a href="https://www.instagram.com/swwweet.daekun/" target="_blank" style="
+                                    display: inline-flex; 
+                                    align-items: center; 
+                                    gap: 8px; 
+                                    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737, #FCAF45, #FFDC80);
+                                    color: white; 
+                                    text-decoration: none; 
+                                    padding: 22px 42px; 
+                                    border-radius: 27px; 
+                                    font-weight: bold; 
+                                    font-size: 1.2em;
+                                    transition: transform 0.2s;
+                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    📸 관리자 대건T Instagram
                                 </a>
+                                <a href="https://jdmedu.github.io/university-predictor/" target="_blank" style="
+                                    display: inline-flex; 
+                                    align-items: center; 
+                                    gap: 8px; 
+                                    background: linear-gradient(45deg, #4CAF50, #45a049, #66BB6A, #81C784);
+                                    color: white; 
+                                    text-decoration: none; 
+                                    padding: 22px 42px; 
+                                    border-radius: 27px; 
+                                    font-weight: bold; 
+                                    font-size: 1.2em;
+                                    transition: transform 0.2s;
+                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    🎓 대입 합격 예측 시스템
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2650,7 +2802,7 @@
         function checkAdminPassword() {
             var password = document.getElementById('adminPassword').value.trim();
             
-            if (password === 'teacher123') {
+            if (password === '1212') {
                 isAdminAuthenticated = true;
                 localStorage.setItem('grade3-adminAuth', 'true');
                 
