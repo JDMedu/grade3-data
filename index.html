@@ -2265,36 +2265,48 @@ function addBadgeTooltipEvents() {
     console.log('뱃지 툴팁 이벤트 설정 중... 발견된 뱃지 수:', badges.length);
     
     badges.forEach(function(badge, index) {
-       // 기존 이벤트 리스너 제거
+        // 기존 이벤트 리스너 제거
         badge.removeEventListener('mouseenter', badge._mouseenterHandler);
         badge.removeEventListener('mouseleave', badge._mouseleaveHandler);
         badge.removeEventListener('click', badge._clickHandler);
         
-        var badgeText = badge.textContent
-        .replace('NEW!', '')
-        .replace(/[\n\r\t]/g, ' ')  // 줄바꿈, 탭 문자를 공백으로 변경
-        .replace(/\s+/g, ' ')       // 연속된 공백을 하나로 통합
-        .replace(/[\u{1F000}-\u{1F9FF}]/gu, '') // 모든 이모지 제거 (유니코드 범위)
-        .replace(/[\u{2600}-\u{26FF}]/gu, '') // 기타 심볼 제거
-        .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats 제거
-        .trim();                    // 앞뒤 공백 제거
-        console.log('뱃지 설정:', index, badgeText);
+        // 더 안전한 텍스트 추출 방법
+        var badgeText = '';
+        var textNodes = [];
         
-                        
+        // 모든 텍스트 노드 수집
+        function collectTextNodes(node) {
+            if (node.nodeType === 3) { // TEXT_NODE
+                textNodes.push(node.nodeValue);
+            } else {
+                for (var i = 0; i < node.childNodes.length; i++) {
+                    collectTextNodes(node.childNodes[i]);
+                }
+            }
+        }
+        
+        collectTextNodes(badge);
+        badgeText = textNodes.join(' ')
+            .replace('NEW!', '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        
+        console.log('뱃지 설정:', index, '"' + badgeText + '"');
+        
         // 모바일: 클릭 이벤트
         badge._clickHandler = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('뱃지 클릭:', badgeText);
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('뱃지 클릭:', '"' + badgeText + '"');
+            
+            if (currentTooltip) {
+                hideBadgeTooltip();
+            } else {
+                showBadgeTooltip(e, badgeText);
+            }
+        };
         
-        if (currentTooltip) {
-            hideBadgeTooltip();
-        } else {
-            showBadgeTooltip(e, badgeText);
-        }
-    };
-        
-       badge.addEventListener('click', badge._clickHandler);
+        badge.addEventListener('click', badge._clickHandler);
     });
 }
 
