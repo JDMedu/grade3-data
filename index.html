@@ -1151,6 +1151,92 @@
             box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
             animation: grand-master-glow 2s infinite alternate;
         }
+
+        /* 🚀 여기부터 새로운 CSS 추가! */
+/* 새로운 뱃지 스타일 */
+.achievement-badge.single-jump { 
+    background: linear-gradient(45deg, #16a085, #2ecc71); 
+}
+.achievement-badge.total-growth { 
+    background: linear-gradient(45deg, #27ae60, #2ecc71); 
+}
+.achievement-badge.subject-master { 
+    background: linear-gradient(45deg, #9b59b6, #8e44ad); 
+}
+
+/* 뱃지 설명 툴팁 스타일 */
+.badge-tooltip {
+    position: fixed;                    /* absolute → fixed 변경 */
+    background: rgba(0, 0, 0, 0.95);   /* 0.9 → 0.95 변경 (더 진하게) */
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    max-width: 250px;
+    z-index: 99999;                    /* 1000 → 99999 변경 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    line-height: 1.4;
+}
+
+.badge-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.badge-tooltip::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid rgba(0, 0, 0, 0.9);
+}
+
+.achievement-badge {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.achievement-badge:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+/* 모바일에서 클릭 피드백 */
+.achievement-badge:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .badge-tooltip {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+        text-align: center;
+    }
+    
+    .badge-tooltip::after {
+        display: none;
+    }
+}
+
+.badge-new {
+    animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
         
     </style>
 </head>
@@ -1739,168 +1825,489 @@
             return variance;
         }
         
-        // 🏆 확장된 뱃지 시스템 (20개)
-        function generateAchievementBadges(student, stats) {
-            var badges = [];
-            var grades = student.grades;
-            var gradeKeys = Object.keys(grades);
-            
-            if (!stats) return badges;
-            
-            // 점수와 등급 데이터 준비
-            var scores = [];
-            var gradeValues = [];
-            var subjectScores = {};
-            
-            gradeKeys.forEach(function(testName) {
-                var gradeData = grades[testName];
-                if (gradeData.score) scores.push(parseInt(gradeData.score));
-                if (gradeData.grade) gradeValues.push(parseInt(gradeData.grade));
-                
-                // 과목별 점수 수집
-                if (gradeData.details) {
-                    Object.keys(gradeData.details).forEach(function(subject) {
-                        if (!subjectScores[subject]) subjectScores[subject] = [];
-                        subjectScores[subject].push(gradeData.details[subject]);
-                    });
-                }
+       // 🏆 확장된 뱃지 시스템 (43개)
+function generateAchievementBadges(student, stats) {
+    var badges = [];
+    var grades = student.grades;
+    var gradeKeys = Object.keys(grades);
+    
+    if (!stats) return badges;
+    
+    // 점수와 등급 데이터 준비
+    var scores = [];
+    var gradeValues = [];
+    var subjectScores = {};
+    var subjectRatios = {}; // ✅ 여기서 초기화
+    
+    gradeKeys.forEach(function(testName) {
+        var gradeData = grades[testName];
+        if (gradeData.score) scores.push(parseInt(gradeData.score));
+        if (gradeData.grade) gradeValues.push(parseInt(gradeData.grade));
+        
+        // 과목별 점수 수집
+        if (gradeData.details) {
+            Object.keys(gradeData.details).forEach(function(subject) {
+                if (!subjectScores[subject]) subjectScores[subject] = [];
+                subjectScores[subject].push(gradeData.details[subject]);
             });
-            
-            // 연속 상승/하락 체크
-            var consecutiveUp = 0;
-            var consecutiveDown = 0;
-            var maxConsecutiveUp = 0;
-            var maxConsecutiveDown = 0;
-            
-            for (var i = 1; i < scores.length; i++) {
-                if (scores[i] > scores[i-1]) {
-                    consecutiveUp++;
-                    consecutiveDown = 0;
-                    maxConsecutiveUp = Math.max(maxConsecutiveUp, consecutiveUp);
-                } else if (scores[i] < scores[i-1]) {
-                    consecutiveDown++;
-                    consecutiveUp = 0;
-                    maxConsecutiveDown = Math.max(maxConsecutiveDown, consecutiveDown);
-                } else {
-                    consecutiveUp = 0;
-                    consecutiveDown = 0;
-                }
-            }
-            
-            // 과목별 강점 체크
-            var strongSubjects = 0;
-            var excellentSubjects = 0;
-            Object.keys(subjectScores).forEach(function(subject) {
-                var avg = subjectScores[subject].reduce((a, b) => a + b) / subjectScores[subject].length;
-                if (avg >= 80) strongSubjects++;
-                if (avg >= 90) excellentSubjects++;
-            });
-            
-            // 🏆 뱃지 조건 체크 (20개 뱃지, 중복 가능)
-            
-            // 1. 등급 관련 뱃지 (5개)
-            if (stats.bestGrade === 1) {
-                badges.push({ icon: "👑", text: "1등급 달성", type: "grade", isNew: true });
-            }
-            if (stats.bestGrade <= 2) {
-                badges.push({ icon: "🏆", text: "상위등급 달성", type: "grade", isNew: false });
-            }
-            if (stats.bestGrade <= 3) {
-                badges.push({ icon: "🥉", text: "3등급 이내", type: "grade", isNew: false });
-            }
-            if (stats.avgGrade <= 2.5) {
-                badges.push({ icon: "🎪", text: "우수한 등급", type: "grade", isNew: false });
-            }
-            if (stats.avgGrade <= 1.5) {
-                badges.push({ icon: "🎖️", text: "최상위 등급", type: "grade", isNew: true });
-            }
-            
-            // 2. 점수 관련 뱃지 (4개)
-            if (stats.bestScore >= 95) {
-                badges.push({ icon: "💎", text: "95점 이상", type: "score", isNew: true });
-            }
-            if (stats.avgScore >= 85) {
-                badges.push({ icon: "🌟", text: "고득점자", type: "score", isNew: false });
-            }
-            if (stats.bestScore >= 100) {
-                badges.push({ icon: "🎯", text: "만점 달성", type: "score", isNew: true });
-            }
-            if (stats.avgScore >= 90) {
-                badges.push({ icon: "✨", text: "우수한 평균", type: "score", isNew: false });
-            }
-            
-            // 3. 성적 변화 뱃지 (3개)
-            if (maxConsecutiveUp >= 2) {
-                badges.push({ icon: "🔥", text: "연속 상승", type: "trend", isNew: true });
-            }
-            if (maxConsecutiveUp >= 3) {
-                badges.push({ icon: "🚀", text: "3연속 상승", type: "trend", isNew: true });
-            }
-            if (maxConsecutiveUp >= 4) {
-                badges.push({ icon: "🌪️", text: "폭풍 상승", type: "trend", isNew: true });
-            }
-            
-            // 4. 점수 개선 뱃지 (3개)
-            if (stats.scoreChange >= 15) {
-                badges.push({ icon: "📈", text: "대폭 상승", type: "improvement", isNew: true });
-            }
-            if (stats.scoreChange >= 25) {
-                badges.push({ icon: "⚡", text: "폭발적 상승", type: "improvement", isNew: true });
-            }
-            if (stats.scoreChange >= 35) {
-                badges.push({ icon: "🎆", text: "기적의 상승", type: "improvement", isNew: true });
-            }
-            
-            // 5. 출석 및 성실성 뱃지 (3개)
-            if (stats.testCount >= 5) {
-                badges.push({ icon: "⭐", text: "성실한 응시", type: "attendance", isNew: false });
-            }
-            if (stats.testCount >= 8) {
-                badges.push({ icon: "💪", text: "꾸준한 도전", type: "attendance", isNew: false });
-            }
-            if (stats.testCount === stats.totalTests) {
-                badges.push({ icon: "🏅", text: "완벽한 출석", type: "attendance", isNew: true });
-            }
-            
-            // 6. 특별 성취 뱃지 (2개)
-            if (strongSubjects >= 3) {
-                badges.push({ icon: "🧠", text: "다재다능", type: "special", isNew: false });
-            }
-            if (excellentSubjects >= 2) {
-                badges.push({ icon: "🎨", text: "과목 마스터", type: "special", isNew: false });
-            }
-            
-            // 새로 추가된 뱃지들 (6개)
-            
-            // 7. 안정성 뱃지 (2개)
-            if (scores.length >= 3) {
-                var scoreVariance = calculateVariance(scores);
-                if (scoreVariance < 50) {
-                    badges.push({ icon: "🛡️", text: "안정적 성취", type: "stability", isNew: false });
-                }
-                if (scoreVariance < 25) {
-                    badges.push({ icon: "🏰", text: "완벽한 안정", type: "stability", isNew: true });
-                }
-            }
-            
-            // 8. 순위 관련 뱃지 (2개)
-            if (stats.percentile <= 5) {
-                badges.push({ icon: "🥇", text: "상위 5%", type: "rank", isNew: true });
-            }
-            if (stats.percentile <= 20) {
-                badges.push({ icon: "🎖️", text: "상위 20%", type: "rank", isNew: false });
-            }
-            
-            // 9. 특수 상황 뱃지 (2개)
-            if (maxConsecutiveDown >= 2 && consecutiveUp >= 2) {
-                badges.push({ icon: "🔄", text: "극적 회복", type: "recovery", isNew: true });
-            }
-            if (scores.length >= 5 && scores[scores.length-1] > scores[0] + 20) {
-                badges.push({ icon: "📊", text: "장기 성장", type: "recovery", isNew: false });
-            }
-            
-            return badges;
         }
+        
+        // ✅ 과목별 비율 수집 추가
+        if (gradeData.ratios) {
+            Object.keys(gradeData.ratios).forEach(function(subject) {
+                if (!subjectRatios[subject]) subjectRatios[subject] = [];
+                subjectRatios[subject].push(gradeData.ratios[subject]);
+            });
+        }
+    });
+    
+    // 연속 상승/하락 체크
+    var consecutiveUp = 0;
+    var consecutiveDown = 0;
+    var maxConsecutiveUp = 0;
+    var maxConsecutiveDown = 0;
+    
+    for (var i = 1; i < scores.length; i++) {
+        if (scores[i] > scores[i-1]) {
+            consecutiveUp++;
+            consecutiveDown = 0;
+            maxConsecutiveUp = Math.max(maxConsecutiveUp, consecutiveUp);
+        } else if (scores[i] < scores[i-1]) {
+            consecutiveDown++;
+            consecutiveUp = 0;
+            maxConsecutiveDown = Math.max(maxConsecutiveDown, consecutiveDown);
+        } else {
+            consecutiveUp = 0;
+            consecutiveDown = 0;
+        }
+    }
+    
+    // 과목별 강점 체크
+    var strongSubjects = 0;
+    var excellentSubjects = 0;
+    Object.keys(subjectScores).forEach(function(subject) {
+        var avg = subjectScores[subject].reduce((a, b) => a + b) / subjectScores[subject].length;
+        if (avg >= 80) strongSubjects++;
+        if (avg >= 90) excellentSubjects++;
+    });
+    
+// 🏆 뱃지 조건 체크 (43개 뱃지, 중복 가능)
+
+// 1. 등급 관련 뱃지 (5개)
+if (stats.bestGrade === 1) {
+    badges.push({ icon: "👑", text: "1등급 달성", type: "grade", isNew: true });
+}
+if (stats.bestGrade <= 2) {
+    badges.push({ icon: "🏆", text: "상위등급 달성", type: "grade", isNew: false });
+}
+if (stats.bestGrade <= 3) {
+    badges.push({ icon: "🥉", text: "3등급 이내", type: "grade", isNew: false });
+}
+if (stats.avgGrade <= 2.5) {
+    badges.push({ icon: "🎪", text: "우수한 등급", type: "grade", isNew: false });
+}
+if (stats.avgGrade <= 1.5) {
+    badges.push({ icon: "🎖️", text: "최상위 등급", type: "grade", isNew: true });
+}
+
+// 2. 점수 관련 뱃지 (4개)
+if (stats.bestScore >= 95) {
+    badges.push({ icon: "💎", text: "95점 이상", type: "score", isNew: true });
+}
+if (stats.avgScore >= 85) {
+    badges.push({ icon: "🌟", text: "고득점자", type: "score", isNew: false });
+}
+if (stats.bestScore >= 100) {
+    badges.push({ icon: "🎯", text: "만점 달성", type: "score", isNew: true });
+}
+if (stats.avgScore >= 90) {
+    badges.push({ icon: "✨", text: "우수한 평균", type: "score", isNew: false });
+}
+
+// 3. 성적 변화 뱃지 (3개)
+if (maxConsecutiveUp >= 2) {
+    badges.push({ icon: "🔥", text: "연속 상승", type: "trend", isNew: true });
+}
+if (maxConsecutiveUp >= 3) {
+    badges.push({ icon: "🚀", text: "3연속 상승", type: "trend", isNew: true });
+}
+if (maxConsecutiveUp >= 4) {
+    badges.push({ icon: "🌪️", text: "4연속 폭풍 상승", type: "trend", isNew: true });
+}
+
+// 4. 점수 개선 뱃지 (3개) - 최근 변화량
+if (stats.scoreChange >= 15) {
+    badges.push({ icon: "📈", text: "대폭 상승", type: "improvement", isNew: true });
+}
+if (stats.scoreChange >= 25) {
+    badges.push({ icon: "⚡", text: "폭발적 상승", type: "improvement", isNew: true });
+}
+if (stats.scoreChange >= 35) {
+    badges.push({ icon: "🎆", text: "기적의 상승", type: "improvement", isNew: true });
+}
+
+// 5. 출석 및 성실성 뱃지 (3개)
+if (stats.testCount >= 5) {
+    badges.push({ icon: "⭐", text: "성실한 응시", type: "attendance", isNew: false });
+}
+if (stats.testCount >= 8) {
+    badges.push({ icon: "💪", text: "꾸준한 도전", type: "attendance", isNew: false });
+}
+if (stats.testCount === stats.totalTests) {
+    badges.push({ icon: "🏅", text: "완벽한 출석", type: "attendance", isNew: true });
+}
+
+// 7. 안정성 뱃지 (2개)
+if (scores.length >= 3) {
+    var scoreVariance = calculateVariance(scores);
+    if (scoreVariance < 50) {
+        badges.push({ icon: "🛡️", text: "안정적 성취", type: "stability", isNew: false });
+    }
+    if (scoreVariance < 25) {
+        badges.push({ icon: "🏰", text: "완벽한 안정", type: "stability", isNew: true });
+    }
+}
+
+// 1등급 마스터 뱃지 (등급 관련 뱃지 섹션에 추가)
+    var consecutiveGrade1 = 0;
+    var maxConsecutiveGrade1 = 0;
+    for (var i = 0; i < gradeValues.length; i++) {
+        if (gradeValues[i] === 1) {
+            consecutiveGrade1++;
+            maxConsecutiveGrade1 = Math.max(maxConsecutiveGrade1, consecutiveGrade1);
+        } else {
+            consecutiveGrade1 = 0;
+        }
+    }
+    
+    if (maxConsecutiveGrade1 >= 5) {
+        badges.push({ icon: "👑", text: "1등급 마스터", type: "grade", isNew: true });
+    }
+
+// 9. 회복/성장 뱃지 (2개)
+if (maxConsecutiveDown >= 2 && consecutiveUp >= 2) {
+    badges.push({ icon: "🔄", text: "극적 회복", type: "recovery", isNew: true });
+}
+if (scores.length >= 5 && scores[scores.length-1] > scores[0] + 20) {
+    badges.push({ icon: "📊", text: "장기 성장", type: "recovery", isNew: false });
+}
+
+// ========== 🆕 새로 추가된 뱃지들 ==========
+
+// 10. 한 번의 큰 점프 뱃지 (3개)
+var maxSingleJump = 0;
+if (scores.length >= 2) {
+    for (var i = 1; i < scores.length; i++) {
+        var jump = scores[i] - scores[i-1];
+        maxSingleJump = Math.max(maxSingleJump, jump);
+    }
+    
+    // 한 번의 큰 점프 뱃지
+    if (maxSingleJump >= 35) {
+        badges.push({ icon: "🌈", text: "놀라운 점프", type: "single-jump", isNew: true });
+    }
+    if (maxSingleJump >= 25) {
+        badges.push({ icon: "🎢", text: "큰 도약", type: "single-jump", isNew: false });
+    }
+    if (maxSingleJump >= 15) {
+        badges.push({ icon: "📍", text: "성공적 점프", type: "single-jump", isNew: false });
+    }
+}
+
+// 11. 전체 성장 뱃지 (2개)
+if (scores.length >= 3) {
+    // 역전 스토리 뱃지 (한번 많이 떨어졌다가 다시 올라온 경우)
+    var minScore = Math.min(...scores);
+    var maxScore = Math.max(...scores);
+    var minIndex = scores.indexOf(minScore);
+    var maxIndex = scores.lastIndexOf(maxScore);
+    
+    if (minIndex < maxIndex && (maxScore - minScore) >= 40) {
+        badges.push({ icon: "🔄", text: "역전의 스토리", type: "total-growth", isNew: true });
+    }
+    
+    // 안정적 상승 (전체적으로 꾸준히 오름)
+    var upwardCount = 0;
+    for (var i = 1; i < scores.length; i++) {
+        if (scores[i] >= scores[i-1]) upwardCount++;
+    }
+    var upwardRatio = upwardCount / (scores.length - 1);
+    
+    var firstScore = scores[0];
+    var lastScore = scores[scores.length - 1];
+    var totalChange = lastScore - firstScore;
+    
+    if (upwardRatio >= 0.8 && totalChange >= 15) {
+        badges.push({ icon: "🚀", text: "꾸준한 상승세", type: "total-growth", isNew: false });
+    }
+}
+
+   // 12. 과목별 마스터 뱃지 (9개 + 3개 종합)
+    var subjectMasters = [];
+    
+    var koreanSubjects = [
+        '독서(인문 이론)', '독서(사회)', '독서(과학)',
+        '문학(현대시)', '문학(현대소설)', '문학(고전시가)', '문학(고전소설)',
+        '언어 화법', '매체 작문'
+    ];
+    
+    koreanSubjects.forEach(function(targetSubject) {
+        var subjectMapping = {
+            '독서(인문 이론)': ['독서(인문 이론)', '독서(인문이론)', '독서인문', '인문'],
+            '독서(사회)': ['독서(사회)', '독서사회', '사회'],
+            '독서(과학)': ['독서(과학)', '독서과학', '과학'],
+            '문학(현대시)': ['문학(현대시)', '문학현대시', '현대시', '현시'],
+            '문학(현대소설)': ['문학(현대소설)', '문학현대소설', '현대소설', '현소'],
+            '문학(고전시가)': ['문학(고전시가)', '문학고전시가', '고전시가', '고시'],
+            '문학(고전소설)': ['문학(고전소설)', '문학고전소설', '고전소설', '고소'],
+            '언어 화법': ['언어 화법', '언어화법', '화법'],
+            '매체 작문': ['매체 작문', '매체작문', '작문']
+        };
+        
+        var possibleNames = subjectMapping[targetSubject] || [targetSubject];
+        var matchedSubject = null;
+        
+        for (var actualSubject in subjectRatios) {
+            for (var i = 0; i < possibleNames.length; i++) {
+                if (actualSubject === possibleNames[i] || 
+                    actualSubject.includes(possibleNames[i]) || 
+                    possibleNames[i].includes(actualSubject)) {
+                    matchedSubject = actualSubject;
+                    break;
+                }
+            }
+            if (matchedSubject) break;
+        }
+        
+        if (matchedSubject && subjectRatios[matchedSubject]) {
+        var ratios = subjectRatios[matchedSubject];
+        
+        // 전체 시험 중 연속된 4회 100% 달성 여부 체크
+        var hasConsecutive4Perfect = false;
+        
+        if (ratios.length >= 4) {
+            for (var i = 0; i <= ratios.length - 4; i++) {
+                var consecutive4 = ratios.slice(i, i + 4);
+                if (consecutive4.every(ratio => ratio >= 100)) {
+                    hasConsecutive4Perfect = true;
+                    break;
+                }
+            }
+        }
+        
+        if (hasConsecutive4Perfect) {
+            badges.push({ 
+                icon: "🏆", 
+                text: targetSubject + " 마스터", 
+                type: "subject-master", 
+                isNew: true 
+            });
+            subjectMasters.push(targetSubject);
+        }
+    }
+    });
+    
+    // 13. 종합 뱃지 (3개)
+    if (subjectMasters.length >= 3) {
+        badges.push({ icon: "🎓", text: "국어 올라운더", type: "subject-master", isNew: true });
+    }
+    if (subjectMasters.length >= 5) {
+        badges.push({ icon: "📚", text: "국어 마에스트로", type: "subject-master", isNew: true });
+    }
+    if (subjectMasters.length >= 9) {
+        badges.push({ icon: "👑", text: "국어 레전더리", type: "subject-master", isNew: true });
+    }
+    
+    // 
+    return badges;
+}
+
+        // 뱃지 설명 데이터
+var badgeDescriptions = {
+    // 등급 관련 뱃지
+    "1등급 달성": "국어 모의고사에서 최고 등급인 1등급을 달성했습니다! 상위 4% 안에 드는 뛰어난 성취입니다.",
+    "상위등급 달성": "2등급 이상의 상위 등급을 달성했습니다. 꾸준한 노력의 결과입니다!",
+    "3등급 이내": "3등급 이내의 준수한 성적을 기록했습니다. 상위권 진입의 발판이 되었네요!",
+    "우수한 등급": "평균 2.5등급 이상의 우수한 성적을 유지하고 있습니다.",
+    "최상위 등급": "평균 1.5등급 이상! 최상위권 학생의 증거입니다.",
+    
+    // 점수 관련 뱃지
+    "95점 이상": "95점 이상의 고득점을 달성했습니다! 거의 만점에 가까운 실력이네요.",
+    "고득점자": "평균 85점 이상의 안정적인 고득점을 유지하고 있습니다.",
+    "만점 달성": "100점 만점을 달성했습니다! 완벽한 실력을 보여주었네요.",
+    "우수한 평균": "평균 90점 이상의 뛰어난 실력을 보여주고 있습니다.",
+    
+    // 성적 변화 뱃지
+    "연속 상승": "2회 연속으로 성적이 상승했습니다. 꾸준한 발전이 돋보입니다!",
+    "3연속 상승": "3회 연속 상승! 지속적인 성장 곡선을 그리고 있습니다.",
+    "4연속 폭풍 상승": "4회 연속 상승의 놀라운 기록! 멈출 수 없는 상승세입니다.",
+    
+    // 점수 개선 뱃지
+    "대폭 상승": "이전 시험 대비 15점 이상 상승했습니다. 큰 발전이네요!",
+    "폭발적 상승": "25점 이상의 폭발적인 상승을 기록했습니다!",
+    "기적의 상승": "35점 이상의 기적 같은 상승! 놀라운 발전입니다.",
+    
+    // 출석 및 성실성 뱃지
+    "성실한 응시": "5회 이상의 모의고사에 성실하게 참여했습니다.",
+    "꾸준한 도전": "8회 이상 꾸준히 모의고사에 도전하는 성실함을 보였습니다.",
+    "완벽한 출석": "모든 모의고사에 빠짐없이 참여했습니다. 성실성의 상징!",
+    
+                   
+    // 안정성 뱃지
+    "안정적 성취": "성적의 편차가 적어 안정적인 실력을 보여주고 있습니다.",
+    "완벽한 안정": "매우 안정적인 성적 유지! 실력이 확고히 자리잡았습니다.",
+    
+   // 등급 관련 뱃지 섹션에 추가
+    "1등급 마스터": "1등급을 5회 연속으로 달성한 진정한 최상위권 학생입니다! 꾸준함과 실력을 모두 갖춘 마스터입니다.",
+    
+    // 회복/성장 뱃지
+    "극적 회복": "연속 하락 후 극적으로 회복한 드라마틱한 스토리를 만들었습니다!",
+    "장기 성장": "장기간에 걸쳐 20점 이상의 꾸준한 성장을 보였습니다.",
+    
+    // 한번의 큰 점프 뱃지
+    "놀라운 점프": "한 번에 35점 이상의 놀라운 점수 향상을 이뤘습니다!",
+    "큰 도약": "25점 이상의 큰 도약을 해냈습니다!",
+    "성공적 점프": "15점 이상의 성공적인 점수 향상을 기록했습니다.",
+    
+    // 전체 성장 뱃지
+    "역전의 스토리": "최저점에서 최고점까지, 감동적인 역전 드라마를 써냈습니다!",
+    "꾸준한 상승세": "전체적으로 꾸준한 상승세를 보이며 성장하고 있습니다.",
+    
+    // 고3 과목별 마스터 뱃지
+    "독서(인문 이론) 마스터": "독서(인문 이론) 영역에서 최근 4회 연속 만점! 완벽한 마스터입니다.",
+    "독서(사회) 마스터": "독서(사회) 영역 최근 4회 연속 만점! 사회 현상 이해력이 우수합니다.",
+    "독서(과학) 마스터": "독서(과학) 영역 최근 4회 연속 만점! 과학적 사고력이 탁월합니다.",
+    "문학(현대시) 마스터": "현대시 영역 최근 4회 연속 만점! 시적 감수성이 뛰어납니다.",
+    "문학(현대소설) 마스터": "현대소설 영역 최근 4회 연속 만점! 서사 이해력이 완벽합니다.",
+    "문학(고전시가) 마스터": "고전시가 영역 최근 4회 연속 만점! 고전 문학의 진수를 이해했습니다.",
+    "문학(고전소설) 마스터": "고전소설 영역 최근 4회 연속 만점! 고전 서사의 대가입니다.",
+    "언어 화법 마스터": "언어 화법 영역에서 최근 4회 연속 만점! 의사소통의 달인입니다.",
+    "매체 작문 마스터": "매체 작문 영역에서 최근 4회 연속 만점! 현대적 소통의 전문가입니다.",
+    
+    // 종합 뱃지
+    "국어 올라운더": "3개 이상의 과목에서 마스터 달성! 국어의 다양한 영역에 능통합니다.",
+    "국어 마에스트로": "5개 이상의 과목에서 마스터 달성! 국어 실력이 대가 수준입니다.",
+    "국어 레전더리": "모든 9개 과목에서 마스터 달성! 국어계의 전설이 되었습니다!"
+};
+
+        // 툴팁 관리 변수
+var currentTooltip = null;
+var tooltipTimeout = null;
+
+// 뱃지 툴팁 표시 함수
+function showBadgeTooltip(event, badgeText) {
+    console.log('툴팁 표시 시도:', badgeText);
+    
+    // 기존 툴팁 제거
+    hideBadgeTooltip();
+    
+    var description = badgeDescriptions[badgeText];
+    if (!description) {
+        console.log('설명을 찾을 수 없음:', badgeText);
+        return;
+    }
+    
+    console.log('툴팁 생성 중:', description);
+    
+    // 툴팁 생성
+    var tooltip = document.createElement('div');
+    tooltip.className = 'badge-tooltip';
+    tooltip.innerHTML = '<strong>' + badgeText + '</strong><br>' + description;
+    document.body.appendChild(tooltip);
+    
+    // 모바일 체크
+    var isMobile = window.innerWidth <= 768;
+    console.log('isMobile:', isMobile);
+    
+
+    // 간단한 위치 설정
+    var rect = event.target.getBoundingClientRect();
+    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+    tooltip.style.top = (rect.top - 10) + 'px';
+    tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
+    
+    // 애니메이션으로 표시
+    requestAnimationFrame(function() {
+        tooltip.classList.add('visible');
+    });
+    
+    currentTooltip = tooltip;
+    
+    // 모바일에서는 3초 후 자동 숨김
+    if (isMobile) {
+        tooltipTimeout = setTimeout(hideBadgeTooltip, 3000);
+    }
+    
+    console.log('툴팁 표시 완료');
+}
+
+// 뱃지 툴팁 숨김 함수
+function hideBadgeTooltip() {
+    if (currentTooltip) {
+        currentTooltip.classList.remove('visible');
+        setTimeout(function() {
+            if (currentTooltip && currentTooltip.parentNode) {
+                currentTooltip.parentNode.removeChild(currentTooltip);
+            }
+            currentTooltip = null;
+        }, 300);
+    }
+    
+    if (tooltipTimeout) {
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = null;
+    }
+}
+
+// 뱃지에 이벤트 리스너 추가하는 함수
+function addBadgeTooltipEvents() {
+    var badges = document.querySelectorAll('.achievement-badge');
+    console.log('뱃지 툴팁 이벤트 설정 중... 발견된 뱃지 수:', badges.length);
+    
+    badges.forEach(function(badge, index) {
+       // 기존 이벤트 리스너 제거
+        badge.removeEventListener('mouseenter', badge._mouseenterHandler);
+        badge.removeEventListener('mouseleave', badge._mouseleaveHandler);
+        badge.removeEventListener('click', badge._clickHandler);
+        
+        var badgeText = badge.textContent
+        .replace('NEW!', '')
+        .replace(/[\n\r\t]/g, ' ')  // 줄바꿈, 탭 문자를 공백으로 변경
+        .replace(/\s+/g, ' ')       // 연속된 공백을 하나로 통합
+        .replace(/[\u{1F000}-\u{1F9FF}]/gu, '') // 모든 이모지 제거 (유니코드 범위)
+        .replace(/[\u{2600}-\u{26FF}]/gu, '') // 기타 심볼 제거
+        .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats 제거
+        .trim();                    // 앞뒤 공백 제거
+        console.log('뱃지 설정:', index, badgeText);
+        
+                        
+        // 모바일: 클릭 이벤트
+        badge._clickHandler = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('뱃지 클릭:', badgeText);
+        
+        if (currentTooltip) {
+            hideBadgeTooltip();
+        } else {
+            showBadgeTooltip(e, badgeText);
+        }
+    };
+        
+       badge.addEventListener('click', badge._clickHandler);
+    });
+}
+
+// 전역 클릭 이벤트로 툴팁 숨김 (모바일)
+document.addEventListener('click', function(e) {
+    // 뱃지나 툴팁을 클릭한 경우가 아니라면 툴팁 숨김
+    if (currentTooltip && 
+        !e.target.classList.contains('achievement-badge') && 
+        !e.target.closest('.achievement-badge') &&
+        !e.target.closest('.badge-tooltip')) {
+        hideBadgeTooltip();
+    }
+});
         
         // 📅 D-day 계산
         function calculateDday() {
@@ -2020,48 +2427,56 @@
                     </div>
                     
                     <!-- 🏆 성취 뱃지 -->
-                    <div class="dashboard-card">
-                        <h3>🏆 성취 뱃지 <span style="font-size: 0.8em; color: #667eea;">(${badges.length}/20개 획득)</span></h3>
-                        
-                        ${badges.length >= 20 ? 
-                            `<div style="
-                                background: linear-gradient(135deg, #ffd700, #ff8c00); 
-                                color: white; 
-                                border-radius: 15px; 
-                                padding: 20px; 
-                                margin: 15px 0; 
-                                text-align: center; 
-                                box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
-                                animation: grand-master-glow 2s infinite alternate;
-                            ">
-                                <div style="font-size: 2em; margin-bottom: 10px;">🎊👑🎊</div>
-                                <div style="font-size: 1.3em; font-weight: bold; margin-bottom: 10px;">
-                                    축하합니다! 모든 뱃지를 모아<br>
-                                    국어 그랜드 마스터가 되었습니다! 🏆
-                                </div>
-                                <div style="font-size: 1.1em; opacity: 0.95;">
-                                    이대건T에게 가서 선물을 수령하세요! 🎁
-                                </div>
-                            </div>` : 
-                            ''
-                        }
-                        
-                        ${badges.length > 0 ? 
-                            '<div class="badge-summary">총 ' + badges.length + '/20개의 뱃지를 획득했습니다!' + 
-                            (badges.length >= 20 ? ' 🎉 그랜드 마스터 달성!' : badges.length >= 15 ? ' 거의 다 모았어요!' : '') + '</div>' +
-                            '<div class="badge-container">' +
-                            badges.map(badge => 
-                                `<div class="achievement-badge ${badge.type} ${badge.isNew ? 'badge-new' : ''}">
-                                    <span>${badge.icon}</span>
-                                    <span>${badge.text}</span>
-                                    ${badge.isNew ? '<span style="font-size: 0.7em;">NEW!</span>' : ''}
-                                </div>`
-                            ).join('') +
-                            '</div>' :
-                            '<p style="color: #666; text-align: center; padding: 20px;">더 많은 시험을 치르면 뱃지를 획득할 수 있어요!</p>'
-                        }
-                    </div>
-                </div>
+<div class="dashboard-card">
+    <h3>🏆 성취 뱃지 <span style="font-size: 0.8em; color: #667eea;">(${badges.length}/40개 획득)</span></h3>
+    
+  
+${badges.length >= 25 ? 
+`<div style="
+    background: linear-gradient(135deg, #ffd700, #ff8c00); 
+    color: white; 
+    border-radius: 15px; 
+    padding: 20px; 
+    margin: 15px 0; 
+    text-align: center; 
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+    animation: grand-master-glow 2s infinite alternate;
+">
+    <div style="font-size: 2em; margin-bottom: 10px;">🎊👑🎊</div>
+    <div style="font-size: 1.3em; font-weight: bold; margin-bottom: 10px;">
+        축하합니다! 25개 이상의 뱃지를 모아<br>
+        국어 그랜드 마스터가 되었습니다! 🏆
+    </div>
+    <div style="font-size: 1.1em; opacity: 0.95;">
+        이대건T에게 가서 선물을 수령하세요! 🎁
+    </div>
+</div>` : 
+''
+}
+
+${badges.length > 0 ? 
+    '<div class="badge-summary">총 ' + badges.length + '/40개의 뱃지를 획득했습니다!' + 
+    (badges.length >= 35 ? ' 🔥 사랑한다 제자야. 고생많았어.!' : 
+     badges.length >= 30 ? ' 🌟 거의 다 모았어요!' : 
+     badges.length >= 25 ? ' 🎉 국어 그랜드 마스터 달성!' : 
+     badges.length >= 15 ? ' 💪 많이 모았네요!' : '') + '</div>' +
+        '<div class="badge-container">' +
+        badges.map(badge => 
+           `<div class="achievement-badge ${badge.type} ${badge.isNew ? 'badge-new' : ''}">
+                <span>${badge.icon}</span>
+                <span>${badge.text}</span>
+                ${badge.isNew ? '<span style="font-size: 0.7em;">NEW!</span>' : ''}
+            </div>`
+        ).join('') +
+        '</div>' :
+    '<p style="color: #666; text-align: center; padding: 20px;">더 많은 시험을 치르면 뱃지를 획득할 수 있어요!</p>'
+    }
+    
+    <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.85em; text-align: center;">
+        💡 <strong>PC:</strong> 뱃지를 클릭하면 설명을 볼 수 있어요!<br>
+        📱 <strong>모바일:</strong> 뱃지를 터치하면 설명이 나타납니다!
+    </div>
+</div>
                 
                 <!-- 📈 성적 변화 그래프 -->
                 <div class="dashboard-card" style="margin: 25px 0;">
@@ -3699,6 +4114,14 @@
             displaySummaryTable(student);
             displayGrades(student.grades);
             resultsDiv.style.display = 'block';
+
+            // 뱃지 툴팁 이벤트를 더 긴 지연 후 실행
+            setTimeout(addBadgeTooltipEvents, 500);
+            
+            // 그래프 생성 (약간의 지연 후)
+            setTimeout(function() {
+                createChart(student);
+            }, 100);
 
             // 그래프 생성 (약간의 지연 후)
             setTimeout(function() {
