@@ -17,7 +17,7 @@
     <style>
         * {
             margin: 0;
-            padding: 0;
+            padding: 0;plan-document-header h3 {
             box-sizing: border-box;
         }
         
@@ -251,7 +251,7 @@
         .grade-strategy h4 {
             margin-bottom: 15px;
             color: #4ade80;
-            font-size: 1.3em;
+            font-size: 1.1em;
         }
         
         .recent-tests-grid {
@@ -1169,7 +1169,7 @@
 }
 
 .plan-document-header h3 {
-    font-size: 1.8em;
+    font-size: 1.4em;
     margin-bottom: 10px;
     color: rgba(255, 255, 255, 0.95);
 }
@@ -1271,7 +1271,7 @@
 }
 
 .subject-name {
-    font-size: 1.2em;
+    font-size: 1.0em;
     font-weight: bold;
     color: rgba(255, 255, 255, 0.95);
 }
@@ -1587,12 +1587,52 @@
     font-size: 3.8vw !important;
     margin-bottom: 8px !important;
 }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin: 20px 0;
-        }
+
+/* 대시보드 모바일 최적화 */
+.dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.dashboard-card {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+.badge-container {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+    gap: 6px;
+}
+
+.achievement-badge {
+    font-size: 2.5vw !important;
+    padding: 6px 8px;
+    min-width: 0;
+    word-break: break-word;
+}
+}  /* ← 이 중괄호가 모바일 미디어 쿼리를 닫는 중괄호입니다! */
+
+.improvement-analysis {  /* ← 여기부터는 PC용 CSS */
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.improvement-analysis h4 {
+    margin-bottom: 15px;
+    color: rgba(255,255,255,0.95);
+    font-size: 1.2em;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 20px 0;
+}
         
         .progress-ring {
             display: flex;
