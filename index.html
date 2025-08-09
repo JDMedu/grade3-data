@@ -249,10 +249,10 @@
         }
         
         .grade-strategy h4 {
-            margin-bottom: 15px;
-            color: #4ade80;
-            font-size: 1.1em;
-        }
+    margin-bottom: 15px;
+    color: #4ade80;
+    font-size: 1.3em;
+}
         
         .recent-tests-grid {
             display: grid;
@@ -1243,35 +1243,37 @@
 }
 
 /* 대시보드 모바일 최적화 */
-.dashboard-grid {
-    grid-template-columns: 1fr !important;
-    gap: 15px;
-    width: 100%;
-    overflow-x: hidden;
-}
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+        width: 100%;
+        overflow-x: hidden;
+    }
 
-.dashboard-card {
-    width: 100%;
-    min-width: 0;
-    overflow-x: hidden;
-}
+    .dashboard-card {
+        width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
 
-.badge-container {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
-    gap: 6px;
-}
+    .badge-container {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+        gap: 6px;
+    }
 
-.achievement-badge {
-    font-size: 2.5vw !important;
-    padding: 6px 8px;
-    min-width: 0;
-    word-break: break-word;
+    .achievement-badge {
+        font-size: 2.5vw !important;
+        padding: 6px 8px;
+        min-width: 0;
+        word-break: break-word;
+    }
 }
 
 .improvement-analysis h4 {
     margin-bottom: 15px;
     color: rgba(255,255,255,0.95);
-    font-size: 1.2em !important;
+    font-size: 1.2em;
 }
             
 .weak-subject-card {
@@ -1552,10 +1554,12 @@
     grid-template-columns: repeat(2, 1fr) !important;
 }
 
-.schedule-week-grid {
-    grid-template-columns: 1fr !important;
+@media (max-width: 768px) {
+    .schedule-week-grid {
+        grid-template-columns: 1fr !important;
+    }
 }
-
+        
 .material-links {
     flex-direction: column;
 }
