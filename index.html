@@ -999,6 +999,7 @@
             padding: 20px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             border-left: 5px solid #667eea;
+            width: 100% !important;  /* !important 추가 */
         }
         
         .dashboard-card h3 {
@@ -1057,7 +1058,7 @@
         /* 뱃지 컨테이너 */
         .badge-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;  /* !important 추가 */
             gap: 8px;
             margin: 15px 0;
         }
@@ -1069,7 +1070,7 @@
             gap: 6px;
             padding: 8px 10px;
             border-radius: 20px;
-            font-size: 0.85em;
+            font-size: 0.85em !important;  /* !important 추가 */
             font-weight: bold;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             text-align: center;
@@ -1243,6 +1244,38 @@
     margin-bottom: 25px;
 }
 
+/* 대시보드 모바일 최적화 */
+.dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.dashboard-card {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+.badge-container {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+    gap: 6px;
+}
+
+.achievement-badge {
+    font-size: 2.5vw !important;
+    padding: 6px 8px;
+    min-width: 0;
+    word-break: break-word;
+}
+
+.improvement-analysis h4 {
+    margin-bottom: 15px;
+    color: rgba(255,255,255,0.95);
+    font-size: 1.2em !important;
+}
+            
 .weak-subject-card {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 10px;
